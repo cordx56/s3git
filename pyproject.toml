@@ -1,0 +1,19 @@
+[project]
+name = "s3-to-git"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "CHISEN Kaoru", email = "cordx56@cordx.cx" }
+]
+dependencies = [
+    "GitPython>=3.1.43",
+    "boto3>=1.35.54",
+    "aws-lambda-typing>=2.20.0",
+    "boto3-type-annotations>=0.3.1",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
