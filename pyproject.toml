@@ -1,7 +1,7 @@
 [project]
-name = "s3-to-git"
+name = "s3git"
 version = "0.1.0"
-description = "Add your description here"
+description = "Detect changes in S3 and push updates to a Git repository using a Lambda function triggered by S3 events"
 authors = [
     { name = "CHISEN Kaoru", email = "cordx56@cordx.cx" }
 ]
@@ -11,9 +11,10 @@ dependencies = [
     "aws-lambda-typing>=2.20.0",
     "boto3-type-annotations>=0.3.1",
     "python-dotenv>=1.0.1",
+    "ignorelib>=0.3.0",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.12"
 
 [tool.rye]
 managed = true
