@@ -62,15 +62,19 @@ def handler(event: events.S3Event, context: context.Context):
             print("clone @", time.time() - start)
 
             # get .s3gitignore file
-            bucket.download_file(S3GIT_IGNORE)
-            ignore = ignorelib.IgnoreFilterManager.build(
-                repo_path,
-                ignore_file_name=".s3gitignore",
-            )
+            ignore = None
+            s3gitignore_path = os.path.join(repo_path, S3GIT_IGNORE)
+            try:
+                bucket.download_file(S3GIT_IGNORE, s3gitignore_path)
+                ignore = ignorelib.IgnoreFilterManager.build(
+                    repo_path,
+                    ignore_file_name=S3GIT_IGNORE,
+                )
+            except:
+                pass
 
             # get files in repo
             to_delete = glob.glob("**/*", root_dir=repo_path, recursive=True, include_hidden=True)
-            repo.ignored()
             to_delete = list(filter(lambda x: os.path.isfile(os.path.join(repo_path, x)), to_delete))
             to_delete = list(set(to_delete) - set(repo.ignored(*to_delete)))
 
@@ -104,9 +108,10 @@ def handler(event: events.S3Event, context: context.Context):
                             if repo.ignored(path):
                                 print(f"{key} is ignored by .gitignore")
                                 return
-                            if ignore.is_ignored(key):
-                                print(f"{key} is ignored by .s3gitignore")
-                                return
+                            if ignore is not None:
+                                if ignore.is_ignored(key):
+                                    print(f"{key} is ignored by .s3gitignore")
+                                    return
                             os.makedirs(os.path.dirname(path), exist_ok=True)
                             try:
                                 with open(path, "rb") as f:
@@ -128,9 +133,10 @@ def handler(event: events.S3Event, context: context.Context):
 
             # list to delete
             for delete in to_delete:
-                if ignore.is_ignored(delete):
-                    print(f"{delete} is ignored by .s3gitignore")
-                    continue
+                if ignore is not None:
+                    if ignore.is_ignored(delete):
+                        print(f"{delete} is ignored by .s3gitignore")
+                        continue
                 print("delete", delete)
                 path = os.path.join(repo_path, delete)
                 os.remove(path)
